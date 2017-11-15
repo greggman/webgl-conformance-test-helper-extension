@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>WebGL Premultiplied Alpha False Compositing Test</title>
+    <meta charset="utf-8">
+    <style>
+    body {
+        margin: 0;
+    }
+    #c {
+        background: #008000;
+    }
+    </style>
+  </head>
+  <body>
+  <canvas id="c"></canvas>
+  </body>
+  <script src="js/webgl-conformance-test-extension-helper.js"></script>
+  <script>
+const gl = document.querySelector("canvas").getContext("webgl", {
+  premultipliedAlpha: false,
+});
+
+gl.enable(gl.SCISSOR_TEST);
+drawRect(0, 0, 150, 150, [1, 0, 0, 0.4]);
+
+function drawRect(x, y, width, height, color) {
+  gl.scissor(x, y, width, height);
+  gl.clearColor(...color);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+}
+
+window.wcte.takeScreenshot()
+.then(function(imageData) {
+  const ctx = document.createElement("canvas").getContext("2d");
+  //ctx.canvas.width = imageData.width;
+  //ctx.canvas.height = imageData.height;
+  ctx.putImageData(imageData, 0, 0);
+  document.body.appendChild(ctx.canvas);
+  const data = imageData.data;
+  log("0:", data[0], data[1], data[2], data[3]);
+})
+.catch(function(err) {
+  log(err);
+});
+
+function log(...args) {
+   const elem = document.createElement("pre");
+   elem.textContent = [...args].join(' ');
+   document.body.appendChild(elem);
+}
+
+  </script>
+</html>
